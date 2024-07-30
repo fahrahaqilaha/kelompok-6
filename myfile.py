@@ -1,7 +1,7 @@
 import streamlit as st
-import requests
-import base64
+import pandas as pd
 import streamlit_lottie
+import base64
 
 def menu_biologi():
     st.subheader("Pemeriksaan Kualitas Air - Biologi")
@@ -11,6 +11,9 @@ def menu_biologi():
     e_coli = st.number_input("Masukkan jumlah E. coli (per 100ml): ", min_value=0, step=1)
     
     if st.button("Periksa Biologi"):
+        koliform_memenuhi = koliform <= baku_mutu_biologi["Koliform"]
+        e_coli_memenuhi = e_coli <= baku_mutu_biologi["E. coli"]
+
         if koliform <= baku_mutu_biologi["Koliform"]:
             st.write("Koliform: Memenuhi baku mutu")
         else:
@@ -20,6 +23,13 @@ def menu_biologi():
             st.write("E. coli: Memenuhi baku mutu")
         else:
             st.write("E. coli: Tidak memenuhi baku mutu")
+        
+        if koliform_memenuhi and e_coli_memenuhi:
+            st.write("Hasil periksa biologi: Memenuhi baku mutu")
+        else:
+            st.write("Hasil periksa biologi: Tidak memenuhi baku mutu")
+            st.write("Air ini tidak cocok untuk hygine sanitasi air minum. Turunkan kadar yang tidak memenuhi baku mutu untuk Hyigine Sanitasi Air Minum")
+        
 
 def menu_kimia():
     st.subheader("Pemeriksaan Kualitas Air - Kimia")
@@ -33,6 +43,13 @@ def menu_kimia():
     besi = st.number_input("Masukkan nilai Besi (mg/L): ", min_value=0.0, step=0.1)
     
     if st.button("Periksa Kimia"):
+        kesadahan_memenuhi = kesadahan <= baku_mutu_kimia["Kesadahan"]
+        nitrat_memenuhi = nitrat <= baku_mutu_kimia["Nitrat"]
+        nitrit_memenuhi = nitrit <= baku_mutu_kimia["Nitrit"]
+        sulfat_memenuhi = sulfat <= baku_mutu_kimia["Sulfat"]
+        fluor_memenuhi = fluor <= baku_mutu_kimia["Fluor"]
+        besi_memenuhi = besi <= baku_mutu_kimia["Besi"]
+        
         if kesadahan <= baku_mutu_kimia["Kesadahan"]:
             st.write("Kesadahan: Memenuhi baku mutu")
         else:
@@ -62,6 +79,15 @@ def menu_kimia():
             st.write("Besi: Memenuhi baku mutu")
         else:
             st.write("Besi: Tidak memenuhi baku mutu")
+        
+        if (kesadahan_memenuhi and nitrat_memenuhi and nitrit_memenuhi and
+        sulfat_memenuhi and fluor_memenuhi and besi_memenuhi):
+            st.write("Hasil periksa kimia: Memenuhi baku mutu")
+        else:
+            st.write("Hasil periksa kimia: Tidak memenuhi baku mutu")
+            st.write("Air ini tidak cocok untuk hygine sanitasi air minum. Turunkan kadar yang tidak memenuhi baku mutu untuk Hyigine Sanitasi Air Minum")
+        
+    
 
 def menu_fisika():
     st.subheader("Pemeriksaan Kualitas Air - Fisika")
@@ -74,6 +100,12 @@ def menu_fisika():
     tds = st.number_input("Masukkan nilai TDS (mg/L): ", min_value=0.0, step=0.1)
     
     if st.button("Periksa Fisika"):
+        suhu_memenuhi = suhu <= baku_mutu_fisika["Suhu"]
+        rasa_memenuhi = rasa.lower() == baku_mutu_fisika["Rasa"].lower()
+        bau_memenuhi = bau.lower() == baku_mutu_fisika["Bau"].lower()
+        warna_memenuhi = warna.lower() == baku_mutu_fisika["Warna"].lower()
+        tds_memenuhi = tds <= baku_mutu_fisika["TDS"]
+
         if suhu <= baku_mutu_fisika["Suhu"]:
             st.write("Suhu: Memenuhi baku mutu")
         else:
@@ -99,6 +131,13 @@ def menu_fisika():
         else:
             st.write("TDS: Tidak memenuhi baku mutu")
 
+        if suhu_memenuhi and rasa_memenuhi and bau_memenuhi and warna_memenuhi and tds_memenuhi:
+            st.write("Hasil periksa fisika: Memenuhi baku mutu")
+        else:
+            st.write("Hasil periksa fisika: Tidak memenuhi baku mutu")
+            st.write("Air ini tidak cocok untuk hygine sanitasi air minum. Turunkan kadar yang tidak memenuhi baku mutu untuk Hyigine Sanitasi Air Minum")
+    
+
 def menu_utama():
     st.title("Home")
     st.markdown(
@@ -106,18 +145,46 @@ def menu_utama():
         Aplikasi ini digunakan untuk menentukan sample uji sesuai standar Buku Mutu Hygine Sanitasi,Peraturan Kementrian Kesehatan Republik Indonesia No 32 Tahun 2017.
       Tentang ndar Baku Mutu Kesehatan Lingkungan Dan Persyaratan Kesehatan Air Untuk Keperluan Higiene Sanitasi, Kolam Renang, Solus Per Aqua, Dan Pemandian Umum.
 
-        Aplikasi ini untuk mempermudah dalam menyesuaikan nilai uji dengan parameter Fisika ,Biologi dan Kimia sesuai Baku Mutu Hygine Sanitasi.
+        Aplikasi ini untuk mempermudah dalam menyesuaikan nilai uji dengan parameter Fisika ,Biologi dan Kimia sesuai Baku Mutu Hygine Sanitasi sera mengukur baku mutu keseluruhan.
         """
     )
+    st.markdown("---")
+    st.title("Pengertian")
+    st.markdown(
+      """
+      Standar   Baku   Mutu   Kesehatan   Lingkungan   adalah   spesifikasi  teknis  atau  nilai  yang  dibakukan  pada  media  lingkungan yang berhubungan atau berdampak langsung terhadap kesehatan masyarakat. 2.Persyaratan  Kesehatan  adalah  kriteria  dan  ketentuan  teknis kesehatan pada media lingkungan. 3.Air  untuk  Keperluan  Higiene  Sanitasi  adalah  air  dengan  kualitas   tertentu   yang   digunakan   untuk   keperluan   sehari-hari yang kualitasnya berbeda dengan kualitas air minum.
+      Higiene Sanitasi adalah upaya untuk mengendalikan faktor risiko terjadinya kontaminasi terhadap makanan, baik yang berasal dari bahan makanan, orang, tempat dan peralatan agar aman dikonsumsi (Permenkes RI No 1096,2011).
+      "Dari beberapa pengertian tersebut diatas dapat disimpulkan bahwa Sanitasi adalah usaha kesehatan preventif yang menitikberatkan kegiatannya kepada usaha kesehatan lingkungan hidup manusia, sedangkan Hygiene adalah usaha kesehatan preventif yang menitikberatkan kegiatannya kepada usaha kesehatan individu, maupun usaha kesehatan pribadi hidup manusia. Jadi dalam hal ini sanitasi ditujukan kepada lingkungannya, sedangkan hygiene ditujukan kepada orangnya."
 
+      """
+    )
+    st.markdown("---")
 def main():
     st.set_page_config(page_title="Pemeriksaan Kualitas Air", page_icon="home")
 
 def main():
-    
-    menu = st.sidebar.selectbox("Pilih menu", ["Home", "Biologi", "Kimia", "Fisika", "Keluar"])
+
+    st.markdown("""
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    """, unsafe_allow_html=True)
+
+    menu = st.sidebar.selectbox("Pilih menu", ["Home", "Biologi", "Kimia", "Fisika", "Keluar"], format_func=lambda menu: {
+        "Home": "🏠 Home",
+        "Biologi": "🧫 Biologi",
+        "Kimia": "🧪 Kimia",
+        "Fisika": "🌡️ Fisika",
+        "Keluar": "🚪 Keluar"
+    }[menu])
+
     st.sidebar.markdown("---")
-    st.sidebar.header ("kelompok 6")
+    st.sidebar.header("Kelompok 6")
+    st.sidebar.markdown("---")
+    st.sidebar.header("Fahrah Aqilah Adi'ibah (2330499)")
+    st.sidebar.header("Suci Nur Rauda (2330531)")
+    st.sidebar.header("Khalula desy annisa(2230448)")
+    st.sidebar.header("Dwi gunawan saputra (2330494)")
+    st.sidebar.header("Margareth Violin S (2330509)")
+    st.sidebar.header("Garda Ariestia N (2330504)")
 
     if menu == "Home":
         menu_utama()
@@ -129,7 +196,7 @@ def main():
         menu_fisika()
     elif menu == "Keluar":
         st.write("Terima kasih telah menggunakan aplikasi ini.")
-        st.stop()
+      
 
 def img_to_base64(image_path):
     """Convert image to base64"""
